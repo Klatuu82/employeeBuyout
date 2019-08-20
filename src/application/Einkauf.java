@@ -5,14 +5,11 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.Collections;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.Scene;
-import javafx.scene.layout.Pane;
 
 /**
  * Einkauf
@@ -33,13 +30,14 @@ public class Einkauf implements Comparable<Einkauf> {
     private String datum;
     private String artNummer;
     private String groesse;
-    private double vk, ek;
+    private double vk;
+    private double ek;
     private double rabattwert;
     private double endPreis;
     private Mitarbeiter mitarbeiter;
     private String filiale;
 
-    public Einkauf(Mitarbeiter mitarbeiter, String datum, String filiale, String artNummer, String groesse,
+    Einkauf(Mitarbeiter mitarbeiter, String datum, String filiale, String artNummer, String groesse,
             double vk, double ek, double rabattwert, double endPreis) {
         this.datum = datum;
         this.mitarbeiter = mitarbeiter;
@@ -52,116 +50,83 @@ public class Einkauf implements Comparable<Einkauf> {
         this.endPreis = endPreis;
     }
 
-    public String getDatum() {
+    private String getDatum() {
         return datum;
     }
 
-    public void setDatum(String datum) {
-        this.datum = datum;
-    }
-
-    public String getArtNummer() {
+    private String getArtNummer() {
         return artNummer;
     }
 
-    public void setArtNummer(String artNummer) {
-        this.artNummer = artNummer;
-    }
-
-    public String getGroesse() {
+    private String getGroesse() {
         return groesse;
     }
 
-    public void setGroesse(String groesse) {
-        this.groesse = groesse;
-    }
-
-    public double getVk() {
+    private double getVk() {
         return vk;
     }
 
-    public void setVk(double vk) {
-        this.vk = vk;
-    }
-
-    public double getEk() {
+    private double getEk() {
         return ek;
     }
 
-    public void setEk(double ek) {
-        this.ek = ek;
-    }
-
-    public double getRabattwert() {
+    private double getRabattwert() {
         return rabattwert;
     }
 
-    public void setRabattwert(double rabattwert) {
-        this.rabattwert = rabattwert;
-    }
-
-    public double getEndPreis() {
+    private double getEndPreis() {
         return endPreis;
     }
 
-    public void setEndPreis(double endPreis) {
-        this.endPreis = endPreis;
-    }
-
-    public Mitarbeiter getMitarbeiter() {
+    private Mitarbeiter getMitarbeiter() {
         return mitarbeiter;
     }
 
-    public void setMitarbeiter(Mitarbeiter mitarbeiter) {
-        this.mitarbeiter = mitarbeiter;
-    }
-
-    public String getFiliale() {
+    private String getFiliale() {
         return filiale;
-    }
-
-    public void setFiliale(String filiale) {
-        this.filiale = filiale;
     }
 
     /*
      * Ausgabe in einer Datei
      */
-    public static void speichern(ObservableList<Einkauf> eList) {
+    private static void speichern(ObservableList<Einkauf> eList) {
 
-        LocalDateTime z = LocalDateTime.now();
-        String monat = String.format("%tB", z);//enthält den aktuellen Monat
-        String NameHomeVerzeichnis = System.getProperty("user.dir");
-        Path pfadMitDatei = Paths.get(NameHomeVerzeichnis, "Einkauf" + monat + ".csv");// AusgabeDatei mit Monat
+        Path pfadMitDatei = FileHelper.getMitarbeiterCSV(getFileName());
 
         try (BufferedWriter schreibPuffer = Files.newBufferedWriter(pfadMitDatei)) {
             for (Einkauf einkauf : eList) {
                 String zeile = String.format("%s;%s;%s;%s;%s;%.2f;%.2f;%.2f;%.2f%n",
-                    einkauf.getMitarbeiter(),
-                    einkauf.getDatum(),
-                    einkauf.getFiliale(),
-                    einkauf.getArtNummer(),
-                    einkauf.getGroesse(),
-                    einkauf.getVk(),
-                    einkauf.getEk(),
-                    einkauf.getRabattwert(),
-                    einkauf.getEndPreis());
+                        einkauf.getMitarbeiter(),
+                        einkauf.getDatum(),
+                        einkauf.getFiliale(),
+                        einkauf.getArtNummer(),
+                        einkauf.getGroesse(),
+                        einkauf.getVk(),
+                        einkauf.getEk(),
+                        einkauf.getRabattwert(),
+                        einkauf.getEndPreis());
                 schreibPuffer.write(zeile);
             }
         } catch (IOException ex) {
-            System.out.printf("IO: %s%n", ex.getMessage());
+            System.out.printf(Constant.IO_ERROR_FORMAT, ex.getMessage());
         }
+    }
+
+    // AusgabeDatei mit Monat
+    private static String getFileName() {
+        LocalDateTime z = LocalDateTime.now();
+        String monat = String.format("%tB", z);//enthält den aktuellen Monat
+        return "Einkauf" + monat + ".csv";
     }
 
     /*
      * Ausgabe der Einkäufe der Filiale entsprechend.
      */
-    public static void speichern(ObservableList<Einkauf> eList, String filiale) {
+    static void speichern(ObservableList<Einkauf> eList, String filiale) {
 
         LocalDateTime z = LocalDateTime.now();
         String monat = String.format("%tB", z);
-        String NameHomeVerzeichnis = System.getProperty("user.dir");
-        Path pfadMitDatei = Paths.get(NameHomeVerzeichnis, filiale + monat + ".csv");
+        Path pfadMitDatei = FileHelper.getMitarbeiterCSV(filiale + monat + ".csv");
         double summe = 0.0;
 
         try (BufferedWriter schreibPuffer = Files.newBufferedWriter(pfadMitDatei)) {
@@ -171,11 +136,11 @@ public class Einkauf implements Comparable<Einkauf> {
                         if (eList.get(i).getMitarbeiter().getName().equals(eList.get(i + 1).getMitarbeiter().getName())) {
                             summe = eList.get(i).getEndPreis() + summe;
                             String zeile = String.format("%s;%s;%.2f;%.2f;%.2f;0,00%n",
-                                eList.get(i).getMitarbeiter(),
-                                eList.get(i).getArtNummer(),
-                                eList.get(i).getVk(),
-                                eList.get(i).getEk(),
-                                eList.get(i).getEndPreis());
+                                    eList.get(i).getMitarbeiter(),
+                                    eList.get(i).getArtNummer(),
+                                    eList.get(i).getVk(),
+                                    eList.get(i).getEk(),
+                                    eList.get(i).getEndPreis());
                             schreibPuffer.write(zeile);
                         } else {
                             String zeile = getFormattedString(eList, summe, i);
@@ -191,24 +156,24 @@ public class Einkauf implements Comparable<Einkauf> {
             } else {
                 for (Einkauf einkauf : eList) {
                     String zeile = String.format("%s;%s,%s;%s;%s;%.2f;%.2f;%.2f;%.2f%n",
-                        einkauf.getMitarbeiter(),
-                        einkauf.getDatum(),
-                        einkauf.getFiliale(),
-                        einkauf.getArtNummer(),
-                        einkauf.getGroesse(),
-                        einkauf.getVk(),
-                        einkauf.getEk(),
-                        einkauf.getRabattwert(),
-                        einkauf.getEndPreis());
+                            einkauf.getMitarbeiter(),
+                            einkauf.getDatum(),
+                            einkauf.getFiliale(),
+                            einkauf.getArtNummer(),
+                            einkauf.getGroesse(),
+                            einkauf.getVk(),
+                            einkauf.getEk(),
+                            einkauf.getRabattwert(),
+                            einkauf.getEndPreis());
                     schreibPuffer.write(zeile);
                 }
             }
         } catch (IOException ex) {
-            System.out.printf("IO: %s%n", ex.getMessage());
+            System.out.printf(Constant.IO_ERROR_FORMAT, ex.getMessage());
         }
     }
 
-    public static String getFormattedString(ObservableList<Einkauf> eList, double summe, int i) {
+    private static String getFormattedString(ObservableList<Einkauf> eList, double summe, int i) {
         summe = eList.get(i).getEndPreis() + summe;
         return String.format("%s;%s;%.2f;%.2f;%.2f;%.2f%n",
                 eList.get(i).getMitarbeiter(),
@@ -226,7 +191,7 @@ public class Einkauf implements Comparable<Einkauf> {
     }
 
     // Speichert neuen Mitarbeiter wenn ID noch nicht in Liste
-    public static boolean neuenEiSpeichern(Einkauf neuerEi) {
+    static boolean neuenEiSpeichern(Einkauf neuerEi) {
 
         ObservableList<Einkauf> eList = getEinkaufsListe();
         eList.add(neuerEi);
@@ -236,14 +201,11 @@ public class Einkauf implements Comparable<Einkauf> {
 
     }
 
-    public static ObservableList<Einkauf> getEinkaufsListe() {
-        LocalDateTime z = LocalDateTime.now();
-        String monat = String.format("%tB", z);
-        String NameHomeVerzeichnis = System.getProperty("user.dir");
-        Path pfadMitDatei = Paths.get(NameHomeVerzeichnis, "Einkauf" + monat + ".csv");
+    private static ObservableList<Einkauf> getEinkaufsListe() {
+        Path pfadMitDatei = FileHelper.getMitarbeiterCSV(getFileName());
         ObservableList<Einkauf> eList = FXCollections.observableArrayList();
 
-        if (Files.exists(pfadMitDatei))//Gibt ObservableList von Einkauf zurück
+        if (pfadMitDatei.toFile().exists())//Gibt ObservableList von Einkauf zurück
         {
 
             String zeile = "";
@@ -260,7 +222,7 @@ public class Einkauf implements Comparable<Einkauf> {
                     zeile = lesePuffer.readLine();
                 }
             } catch (IOException ex) {
-                System.out.printf("IO: %s%n", ex.getMessage());
+                System.out.printf(Constant.IO_ERROR_FORMAT, ex.getMessage());
             }
             return eList;
         } else
@@ -269,18 +231,15 @@ public class Einkauf implements Comparable<Einkauf> {
     }
 
     /**
-     * Für einzel Liste von Filialen in .cvs
+     * Gibt eine Liste aller Einkäufe für die Angegebene Filiale.
      *
-     * @param filiale
+     * @param filiale zur Ausgabe.
      */
-    public static ObservableList<Einkauf> listeAusgebenFuerFilX(String filiale) {
-        LocalDateTime z = LocalDateTime.now();
-        String monat = String.format("%tB", z);
-        String NameHomeVerzeichnis = System.getProperty("user.dir");
-        Path pfadMitDatei = Paths.get(NameHomeVerzeichnis, "Einkauf" + monat + ".csv");
+    static ObservableList<Einkauf> listeAusgebenFuerFilX(String filiale) {
+        Path pfadMitDatei = FileHelper.getMitarbeiterCSV(getFileName());
         ObservableList<Einkauf> eList = FXCollections.observableArrayList();
         //Gibt ObservableList von Einkauf zurück
-        if (Files.exists(pfadMitDatei)) {
+        if (pfadMitDatei.toFile().exists()) {
 
             String zeile = "";
 
@@ -288,24 +247,18 @@ public class Einkauf implements Comparable<Einkauf> {
                 zeile = lesePuffer.readLine();
                 while (zeile != null) {
                     String[] teile = zeile.split(";");
-                    if ("Alle".equals(filiale)) {
+                    if ("Alle".equals(filiale) || teile[2].equals(filiale)) {
                         String[] mitarbeiter = teile[0].split(",");
                         Mitarbeiter m = new Mitarbeiter(mitarbeiter[0], mitarbeiter[1], Integer.parseInt(mitarbeiter[2]));
                         eList.add(new Einkauf(m, teile[1], teile[2], teile[3], teile[4], Double.parseDouble(teile[5].replace(",", ".")),
                                 Double.parseDouble(teile[6].replace(",", ".")), Double.parseDouble(teile[7].replace(",", ".")),
                                 Double.parseDouble(teile[8].replace(",", "."))));
 
-                    } else if (teile[2].equals(filiale)) {
-                        String[] mitarbeiter = teile[0].split(",");
-                        Mitarbeiter m = new Mitarbeiter(mitarbeiter[0], mitarbeiter[1], Integer.parseInt(mitarbeiter[2]));
-                        eList.add(new Einkauf(m, teile[1], teile[2], teile[3], teile[4], Double.parseDouble(teile[5].replace(",", ".")),
-                                Double.parseDouble(teile[6].replace(",", ".")), Double.parseDouble(teile[7].replace(",", ".")),
-                                Double.parseDouble(teile[8].replace(",", "."))));
                     }
                     zeile = lesePuffer.readLine();
                 }
             } catch (IOException ex) {
-                System.out.printf("IO: %s%n", ex.getMessage());
+                System.out.printf(Constant.IO_ERROR_FORMAT, ex.getMessage());
             }
             return eList;
         } else
@@ -313,26 +266,21 @@ public class Einkauf implements Comparable<Einkauf> {
 
     }
 
-    public static String getDiscountedListPricePercentage(String listPrice, String percentage) {
+    static String getDiscountedListPricePercentage(String listPrice, String percentage) {
         double listPriceValue = Double.parseDouble(listPrice.replace(",", "."));
         double percentageValue = Double.parseDouble(percentage.replace(",", ".")) / 100;
-        return String.format("%.02f", listPriceValue - (listPriceValue * percentageValue));
+        return String.format(Constant.EURO_FORMAT, listPriceValue - (listPriceValue * percentageValue));
     }
 
-    public static String getDiscountedListPrice(String listPrice, String discount) {
+    static String getDiscountedListPrice(String listPrice, String discount) {
         double listPriceValue = Double.parseDouble(listPrice.replace(",", "."));
         double discountValue = Double.parseDouble(discount.replace(",", "."));
-        return String.format("%.02f", listPriceValue - discountValue);
+        return String.format(Constant.EURO_FORMAT, listPriceValue - discountValue);
     }
 
-    public static String getPriceWithTax(String purchasingPrice, String tax) {
+    static String getPriceWithTax(String purchasingPrice, String tax) {
         double purchasingPriceValue = Double.parseDouble(purchasingPrice.replace(",", "."));
-        return String.format("%.02f", purchasingPriceValue + (purchasingPriceValue * 0.19));
-    }
-
-    public static Scene einkauf() {
-        Pane ap = new Pane();
-        return new Scene(ap, 1000, 800);
+        return String.format(Constant.EURO_FORMAT, purchasingPriceValue + (purchasingPriceValue * 0.19));
     }
 
     @Override

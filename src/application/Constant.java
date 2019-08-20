@@ -28,6 +28,9 @@ class Constant {
     static final String PERCENTAGE = "%";
     static final String CHOOSE_EMPLOYEE = "Mitarbeiter auswählen";
     static final String NEW_EMPLOYEE = "Neuen Mitarbeiter erstellen";
+    static final String EURO_FORMAT = "%.02f";
+    static final String IO_ERROR_FORMAT = "IO: %s%n";
+    static final String MITARBEITER_CSV = "Mitarbeiter.csv";
 
     private Constant() {
     }

@@ -180,8 +180,14 @@ class UIHelper {
     }
 
     void initTextFields(ComboBox<Mitarbeiter> mitarbeiterComboBox) {
+        createTextField(Constant.NAME, 180, 20, 0, 140);
+        setRestrictedChar(textFields.get(Constant.NAME));
+        createTextField(Constant.VORNAME, 180, 170, 0, 140);
+        setRestrictedChar(textFields.get(Constant.VORNAME));
+        createTextField(Constant.EMPLOYEE_NUMBER, 180, 320, 0, 140);
+        setRestrictedNumber(textFields.get(Constant.EMPLOYEE_NUMBER));
         createTextField(Constant.CHOOSE_EMPLOYEE, 480, 20, 160, 160);
-        // Textfeld zum filtern der MitarbeiterListe            
+        // Textfeld zum filtern der MitarbeiterListe
         textFields.get(Constant.CHOOSE_EMPLOYEE).textProperty().addListener((observer, alt, neu) ->
         {
             if (textFields.get(Constant.CHOOSE_EMPLOYEE).getText() != null) {
@@ -194,12 +200,6 @@ class UIHelper {
                 mitarbeiterComboBox.setValue(mitarbeiterListe.get(0));
             }
         });
-        createTextField(Constant.NAME, 180, 20, 0, 140);
-        setRestrictedChar(textFields.get(Constant.NAME));
-        createTextField(Constant.VORNAME, 180, 170, 0, 140);
-        setRestrictedChar(textFields.get(Constant.VORNAME));
-        createTextField(Constant.EMPLOYEE_NUMBER, 180, 320, 0, 140);
-        setRestrictedNumber(textFields.get(Constant.EMPLOYEE_NUMBER));
         createTextField(Constant.ARTICLE_NUMBER, 480, 200, 140, 140);
         createTextField(Constant.SIZE, 480, 350, 70, 70);
         createTextField(Constant.PLAIN_PRICE, 480, 430, 70, 70);

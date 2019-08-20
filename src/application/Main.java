@@ -143,7 +143,7 @@ public class Main extends Application {
 
             /*
              * Speichern der Einkäufe in Datei, mit allen angaben.
-             * Name, Vorname, ID, Datum, Artnr., Größe, Preis(VK/EK), Rabatte, Endpreis
+             * Name, Vorname, ID, Datum, Filiale, Artnr., Größe, VK Preis, EK Preis, Rabatte, Endpreis
              */
             Button buSpeichernEi = uiHelper.getButton(Constant.SAVE_SHOPPING, 480, 830);
             buSpeichernEi.setOnAction(ev -> {
