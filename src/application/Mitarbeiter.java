@@ -41,7 +41,7 @@ public class Mitarbeiter implements Comparable<Mitarbeiter> {
         return vorname;
     }
 
-    private int getPersonalNummer() {
+    int getPersonalNummer() {
         return personalNummer;
     }
 

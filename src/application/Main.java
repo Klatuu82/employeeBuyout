@@ -149,13 +149,17 @@ public class Main extends Application {
             buSpeichernEi.setOnAction(ev -> {
                 LocalDate date = datePicker.getValue();
                 String datum = date.toString();
-                istGespeichert = Einkauf.neuenEiSpeichern(new Einkauf(mitarbeiterComboBox.getValue(),
+                Einkauf neuerEinkauf = new Einkauf(mitarbeiterComboBox.getValue(),
                         datum,
                         filialen.getValue(), textFields.get(Constant.ARTICLE_NUMBER).getText(), textFields.get(Constant.SIZE).getText(),
                         Double.parseDouble(textFields.get(Constant.PLAIN_PRICE).getText().replace(",", ".")),
                         Double.parseDouble(textFields.get(Constant.BUYING_PRICE).getText().replace(",", ".")),
                         Double.parseDouble(textFields.get(Constant.PERCENTAGE).getText().replace(",", ".")),
-                        Double.parseDouble(textFields.get(Constant.FINAL_PRICE).getText().replace(",", "."))));
+                        Double.parseDouble(textFields.get(Constant.FINAL_PRICE).getText().replace(",", ".")));
+                istGespeichert = Einkauf.neuenEiSpeichern(neuerEinkauf);
+                if (istGespeichert) {
+                    textFields.get(Constant.LAST_INPUT).setText(neuerEinkauf.toString());
+                }
                 uiHelper.resetPurchase();
             });
 
