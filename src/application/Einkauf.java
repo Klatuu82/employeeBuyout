@@ -133,7 +133,7 @@ public class Einkauf implements Comparable<Einkauf> {
             if (filiale.equals("Alle")) {
                 for (int i = 0; i < eList.size(); i++) {
                     if (i + 1 < eList.size()) {
-                        if (eList.get(i).getMitarbeiter().getName().equals(eList.get(i + 1).getMitarbeiter().getName())) {
+                        if (eList.get(i).getMitarbeiter().getPersonalNummer() == eList.get(i + 1).getMitarbeiter().getPersonalNummer()) {
                             summe = eList.get(i).getEndPreis() + summe;
                             String zeile = String.format("%s;%s;%.2f;%.2f;%.2f;0,00%n",
                                     eList.get(i).getMitarbeiter(),
@@ -184,49 +184,27 @@ public class Einkauf implements Comparable<Einkauf> {
                 summe);
     }
 
-    // Vergleicht Namen
+    // Vergleicht PersonalNummer
     @Override
     public int compareTo(Einkauf andererMa) {
-        return this.mitarbeiter.getName().compareToIgnoreCase(andererMa.mitarbeiter.getName());
+        int personalNummer = this.mitarbeiter.getPersonalNummer();
+        int personalNummerB = andererMa.mitarbeiter.getPersonalNummer();
+        if (personalNummer > personalNummerB) {
+            return 1;
+        } else if (personalNummer < personalNummerB) {
+            return -1;
+        }
+        return 0;
     }
 
     // Speichert neuen Mitarbeiter wenn ID noch nicht in Liste
     static boolean neuenEiSpeichern(Einkauf neuerEi) {
 
-        ObservableList<Einkauf> eList = getEinkaufsListe();
+        ObservableList<Einkauf> eList = listeAusgebenFuerFilX("Alle");
         eList.add(neuerEi);
         Collections.sort(eList);
         speichern(eList);
         return true;
-
-    }
-
-    private static ObservableList<Einkauf> getEinkaufsListe() {
-        Path pfadMitDatei = FileHelper.getMitarbeiterCSV(getFileName());
-        ObservableList<Einkauf> eList = FXCollections.observableArrayList();
-
-        if (pfadMitDatei.toFile().exists())//Gibt ObservableList von Einkauf zurück
-        {
-
-            String zeile = "";
-
-            try (BufferedReader lesePuffer = Files.newBufferedReader(pfadMitDatei)) {
-                zeile = lesePuffer.readLine();
-                while (zeile != null) {
-                    String[] teile = zeile.split(";");
-                    String[] mitarbeiter = teile[0].split(",");
-                    Mitarbeiter m = new Mitarbeiter(mitarbeiter[0], mitarbeiter[1], Integer.parseInt(mitarbeiter[2]));
-                    eList.add(new Einkauf(m, teile[1], teile[2], teile[3], teile[4], Double.parseDouble(teile[5].replace(",", ".")),
-                            Double.parseDouble(teile[6].replace(",", ".")), Double.parseDouble(teile[7].replace(",", ".")),
-                            Double.parseDouble(teile[8].replace(",", "."))));
-                    zeile = lesePuffer.readLine();
-                }
-            } catch (IOException ex) {
-                System.out.printf(Constant.IO_ERROR_FORMAT, ex.getMessage());
-            }
-            return eList;
-        } else
-            return eList;
 
     }
 
@@ -238,24 +216,23 @@ public class Einkauf implements Comparable<Einkauf> {
     static ObservableList<Einkauf> listeAusgebenFuerFilX(String filiale) {
         Path pfadMitDatei = FileHelper.getMitarbeiterCSV(getFileName());
         ObservableList<Einkauf> eList = FXCollections.observableArrayList();
-        //Gibt ObservableList von Einkauf zurück
         if (pfadMitDatei.toFile().exists()) {
 
-            String zeile = "";
+            String line = "";
 
             try (BufferedReader lesePuffer = Files.newBufferedReader(pfadMitDatei)) {
-                zeile = lesePuffer.readLine();
-                while (zeile != null) {
-                    String[] teile = zeile.split(";");
-                    if ("Alle".equals(filiale) || teile[2].equals(filiale)) {
-                        String[] mitarbeiter = teile[0].split(",");
-                        Mitarbeiter m = new Mitarbeiter(mitarbeiter[0], mitarbeiter[1], Integer.parseInt(mitarbeiter[2]));
-                        eList.add(new Einkauf(m, teile[1], teile[2], teile[3], teile[4], Double.parseDouble(teile[5].replace(",", ".")),
-                                Double.parseDouble(teile[6].replace(",", ".")), Double.parseDouble(teile[7].replace(",", ".")),
-                                Double.parseDouble(teile[8].replace(",", "."))));
+                line = lesePuffer.readLine();
+                while (line != null) {
+                    String[] values = line.split(";");
+                    if ("Alle".equals(filiale) || values[2].equals(filiale)) {
+                        Mitarbeiter m = extractMitarbeiter(values[0]);
+                        Einkauf einkauf = new Einkauf(m, values[1], values[2], values[3], values[4], Double.parseDouble(values[5].replace(",", ".")),
+                                Double.parseDouble(values[6].replace(",", ".")), Double.parseDouble(values[7].replace(",", ".")),
+                                Double.parseDouble(values[8].replace(",", ".")));
+                        eList.add(einkauf);
 
                     }
-                    zeile = lesePuffer.readLine();
+                    line = lesePuffer.readLine();
                 }
             } catch (IOException ex) {
                 System.out.printf(Constant.IO_ERROR_FORMAT, ex.getMessage());
@@ -264,6 +241,11 @@ public class Einkauf implements Comparable<Einkauf> {
         } else
             return eList;
 
+    }
+
+    private static Mitarbeiter extractMitarbeiter(String s) {
+        String[] mitarbeiter = s.split(",");
+        return new Mitarbeiter(mitarbeiter[0], mitarbeiter[1], Integer.parseInt(mitarbeiter[2]));
     }
 
     static String getDiscountedListPricePercentage(String listPrice, String percentage) {
