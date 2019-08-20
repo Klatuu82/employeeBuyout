@@ -209,6 +209,7 @@ class UIHelper {
         createTextField(Constant.PERCENTAGE, 480, 600, 50, 50);
         textFields.get(Constant.PERCENTAGE).setText("0");
         createTextField(Constant.FINAL_PRICE, 480, 720, 90, 90);
+        createTextField(Constant.LAST_INPUT, 560, 20, 0, 600);
     }
 
     void resetEmployee() {

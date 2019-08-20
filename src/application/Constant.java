@@ -31,6 +31,7 @@ class Constant {
     static final String EURO_FORMAT = "%.02f";
     static final String IO_ERROR_FORMAT = "IO: %s%n";
     static final String MITARBEITER_CSV = "Mitarbeiter.csv";
+    protected static final String LAST_INPUT = "lastInput";
 
     private Constant() {
     }
