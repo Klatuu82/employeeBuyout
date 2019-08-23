@@ -232,4 +232,8 @@ class UIHelper {
         mitarbeiterComboBox.setItems(newMitarbeiterListe);
         mitarbeiterComboBox.setValue(newMitarbeiterListe.get(0));
     }
+
+    void setNodeStyle(Node node, String style) {
+        node.setStyle(style);
+    }
 }

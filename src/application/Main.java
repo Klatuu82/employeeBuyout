@@ -147,11 +147,26 @@ public class Main extends Application {
              */
             Button buSpeichernEi = uiHelper.getButton(Constant.SAVE_SHOPPING, 480, 830);
             buSpeichernEi.setOnAction(ev -> {
+                System.out.println("Der Style" + datePicker.getStyle());
+                if (datePicker.getValue() == null) {
+                    uiHelper.setNodeStyle(datePicker, Constant.FX_BORDER_COLOR_RED + Constant.FX_BORDER_WIDTH_2_PX);
+                    return;
+                } else {
+                    uiHelper.setNodeStyle(datePicker, "");
+                }
+                if (textFields.get(Constant.ARTICLE_NUMBER).getText().isEmpty()) {
+                    uiHelper.setNodeStyle(textFields.get(Constant.ARTICLE_NUMBER), Constant.FX_BORDER_COLOR_RED + Constant.FX_BORDER_WIDTH_2_PX);
+                    return;
+                } else {
+                    uiHelper.setNodeStyle(textFields.get(Constant.ARTICLE_NUMBER), "");
+                }
                 LocalDate date = datePicker.getValue();
                 String datum = date.toString();
                 Einkauf neuerEinkauf = new Einkauf(mitarbeiterComboBox.getValue(),
                         datum,
-                        filialen.getValue(), textFields.get(Constant.ARTICLE_NUMBER).getText(), textFields.get(Constant.SIZE).getText(),
+                        filialen.getValue(),
+                        textFields.get(Constant.ARTICLE_NUMBER).getText(),
+                        textFields.get(Constant.SIZE).getText(),
                         Double.parseDouble(textFields.get(Constant.PLAIN_PRICE).getText().replace(",", ".")),
                         Double.parseDouble(textFields.get(Constant.BUYING_PRICE).getText().replace(",", ".")),
                         Double.parseDouble(textFields.get(Constant.PERCENTAGE).getText().replace(",", ".")),

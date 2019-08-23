@@ -31,7 +31,9 @@ class Constant {
     static final String EURO_FORMAT = "%.02f";
     static final String IO_ERROR_FORMAT = "IO: %s%n";
     static final String MITARBEITER_CSV = "Mitarbeiter.csv";
-    protected static final String LAST_INPUT = "lastInput";
+    static final String LAST_INPUT = "lastInput";
+    static final String FX_BORDER_COLOR_RED = "-fx-border-color: #ff0000;";
+    static final String FX_BORDER_WIDTH_2_PX = "-fx-border-width: 2px;";
 
     private Constant() {
     }
